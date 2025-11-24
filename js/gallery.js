@@ -66,58 +66,40 @@ const images = [
 
 //
 
-const galleryEl = document.querySelector(".gallery-js");
-
-//
+const galleryList = document.querySelector(".gallery");
 
 const galleryMarkup = images
   .map(
-    ({ preview, original, description }) => `
-  <li class="gallery-item">
-    <a class="gallery-link" href="${original}">
-      <img
-        class="gallery-image"
-        src="${preview}"
-        data-source="${original}"
-        alt="${description}"
-      />
-    </a>
-  </li>`
+    (img) => `
+<li class="gallery-item">
+  <a class="gallery-link" href="${img.original}">
+    <img
+      class="gallery-image"
+      src="${img.preview}"
+      data-source="${img.original}"
+      alt="${img.description}"
+    />
+  </a>
+</li>`
   )
   .join("");
 
-//
-
-galleryEl.insertAdjacentHTML("beforeend", galleryMarkup);
+galleryList.insertAdjacentHTML("beforeend", galleryMarkup);
 
 //
 
-galleryEl.addEventListener("click", onImageClick);
-
-function onImageClick(event) {
+galleryList.addEventListener("click", (event) => {
   event.preventDefault();
 
-  if (!event.target.classList.contains("gallery-image")) return;
+  const clickedImg = event.target;
 
-  const largeImageURL = event.target.dataset.source;
+  if (clickedImg.nodeName !== "IMG") return;
 
-  const instance = basicLightbox.create(
-    `<img src="${largeImageURL}" width="1440" alt="">`,
-    {
-      onShow: () => {
-        window.addEventListener("keydown", onEscPress);
-      },
-      onClose: () => {
-        window.removeEventListener("keydown", onEscPress);
-      },
-    }
-  );
+  const largeImageURL = clickedImg.dataset.source;
+
+  const instance = basicLightbox.create(`
+    <img src="${largeImageURL}" width="100%" alt="${clickedImg.alt}">
+  `);
 
   instance.show();
-
-  function onEscPress(e) {
-    if (e.key === "Escape") {
-      instance.close();
-    }
-  }
-}
+});
